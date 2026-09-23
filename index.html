@@ -6,12 +6,9 @@
     <title>Doctor Couple Shift Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-thai@5.0.7/index.min.css">
-    
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
     <style>
         * { font-family: 'Noto Sans Thai', sans-serif; }
         .shift-chip { transition: all 0.2s; cursor: pointer; }
@@ -40,6 +37,21 @@
         .template-card:hover { background: #f9fafb; }
         .template-card:hover .edit-btn { opacity: 1; }
         .edit-btn { opacity: 0; transition: opacity 0.2s; }
+        .favorite-btn { transition: all 0.2s; }
+        .favorite-btn:hover { transform: scale(1.2); }
+        .favorite-card { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; }
+        .rank-badge { 
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center; 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%; 
+            background: #f59e0b; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 12px;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -51,7 +63,6 @@
             <h1 class="text-3xl font-bold text-gray-800 mb-2">🏥 Doctor Couple Shift</h1>
             <p class="text-gray-500">วางแผนเวรแพทย์คู่รัก & Sync Real-time</p>
         </div>
-        
         <button onclick="loginWithGoogle()" class="w-full px-6 py-3 bg-white border-2 border-gray-300 rounded-xl font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-3 shadow-sm">
             <svg class="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -61,7 +72,6 @@
             </svg>
             เข้าสู่ระบบด้วย Google
         </button>
-        
         <div class="mt-6 text-center text-sm text-gray-500">
             <p>ข้อมูลจะ sync อัตโนมัติระหว่างคู่รัก</p>
             <p class="mt-1">ปลอดภัย • ฟรี • Real-time</p>
@@ -74,16 +84,13 @@
     <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full animate-slide">
         <h2 class="text-2xl font-bold mb-4"> ยินดีต้อนรับ!</h2>
         <p class="text-gray-600 mb-6">คุณยังไม่มีครอบครัวในระบบ เลือกอย่างใดอย่างหนึ่ง:</p>
-        
         <button onclick="createFamily()" class="w-full px-6 py-3 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 transition mb-3">
             🏠 สร้างครอบครัวใหม่
         </button>
-        
         <div class="relative my-4">
             <div class="absolute inset-0 flex items-center"><div class="w-full border-t"></div></div>
             <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-gray-500">หรือ</span></div>
         </div>
-        
         <div>
             <label class="block text-sm font-medium text-gray-600 mb-1">เข้าร่วมครอบครัวที่มีอยู่แล้ว</label>
             <div class="flex gap-2">
@@ -96,7 +103,6 @@
 
 <!-- Main App -->
 <div id="mainApp" class="hidden max-w-[1400px] mx-auto p-4">
-    <!-- Header -->
     <div class="bg-white rounded-2xl shadow-sm p-6 mb-4">
         <div class="flex items-center justify-between flex-wrap gap-4">
             <div>
@@ -108,22 +114,12 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="showFamilyCode()" class="px-3 py-1.5 bg-violet-50 text-violet-700 rounded-lg text-sm hover:bg-violet-100">
-                    👨‍👩‍👧 รหัสครอบครัว
-                </button>
-                <button onclick="showMembers()" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">
-                    👥 สมาชิก
-                </button>
-                <button onclick="logout()" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">
-                    ออก
-                </button>
+                <button onclick="showFamilyCode()" class="px-3 py-1.5 bg-violet-50 text-violet-700 rounded-lg text-sm hover:bg-violet-100">👨‍‍👧 รหัสครอบครัว</button>
+                <button onclick="showMembers()" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">👥 สมาชิก</button>
+                <button onclick="logout()" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200">ออก</button>
             </div>
         </div>
-        
-        <!-- Members Filter -->
         <div id="membersFilter" class="flex items-center gap-2 mt-4 pt-4 border-t flex-wrap"></div>
-        
-        <!-- Month Navigation -->
         <div class="flex items-center justify-center gap-3 mt-4 pt-4 border-t">
             <button onclick="prevMonth()" class="p-2 hover:bg-gray-100 rounded-lg">◀</button>
             <h2 id="monthLabel" class="text-xl font-semibold min-w-[200px] text-center"></h2>
@@ -133,15 +129,23 @@
     </div>
 
     <div class="flex flex-col lg:flex-row gap-4">
-        <!-- Left Sidebar -->
         <div class="lg:w-72 flex-shrink-0">
-            <!-- Templates -->
+            <!-- Favorite Templates -->
             <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
                 <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-bold text-gray-700">📋 Template เวร</h3>
+                    <h3 class="font-bold text-gray-700">⭐ Favorite Templates</h3>
+                    <span class="text-xs text-gray-500" id="favoriteCount">0/5</span>
+                </div>
+                <div id="favoriteTemplateList" class="space-y-2"></div>
+            </div>
+
+            <!-- All Templates -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 mb-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-gray-700">📋 Template เวรทั้งหมด</h3>
                     <button onclick="openTemplateModal()" class="text-blue-500 hover:text-blue-700 text-xl">+</button>
                 </div>
-                <div id="templateList" class="space-y-2 max-h-[300px] overflow-y-auto"></div>
+                <div id="templateList" class="space-y-2 max-h-[400px] overflow-y-auto"></div>
             </div>
 
             <!-- Conditions -->
@@ -162,23 +166,20 @@
             <!-- Export -->
             <div class="bg-white rounded-2xl shadow-sm p-4">
                 <h3 class="font-bold text-gray-700 mb-3">📤 ส่งออก</h3>
-                <button onclick="exportToGoogleCalendar()" class="w-full px-3 py-2 bg-violet-50 text-violet-700 rounded-lg text-sm hover:bg-violet-100 transition">
-                    📅 ส่งเข้า Google Calendar (.ics)
-                </button>
+                <button onclick="exportToGoogleCalendar()" class="w-full px-3 py-2 bg-violet-50 text-violet-700 rounded-lg text-sm hover:bg-violet-100 transition">📅 ส่งเข้า Google Calendar (.ics)</button>
             </div>
         </div>
 
-        <!-- Main Calendar -->
         <div class="flex-1">
             <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
                 <div class="grid grid-cols-7 bg-gray-50 border-b">
-                    <div class="p-3 text-center text-sm font-semibold text-red-500">อา</div>
                     <div class="p-3 text-center text-sm font-semibold text-gray-600">จ</div>
                     <div class="p-3 text-center text-sm font-semibold text-gray-600">อ</div>
                     <div class="p-3 text-center text-sm font-semibold text-gray-600">พ</div>
                     <div class="p-3 text-center text-sm font-semibold text-gray-600">พฤ</div>
                     <div class="p-3 text-center text-sm font-semibold text-gray-600">ศ</div>
                     <div class="p-3 text-center text-sm font-semibold text-blue-500">ส</div>
+                    <div class="p-3 text-center text-sm font-semibold text-red-500">อา</div>
                 </div>
                 <div id="calendarGrid" class="grid grid-cols-7"></div>
             </div>
@@ -198,9 +199,19 @@
             <table class="w-full text-sm">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="p-3 text-left">วันที่</th>
+                        <th class="p-3 text-left cursor-pointer hover:bg-gray-100 transition" onclick="toggleSort('date')">
+                            <div class="flex items-center gap-1">
+                                วันที่
+                                <span id="sortDate" class="text-gray-400 text-xs">↕️</span>
+                            </div>
+                        </th>
                         <th class="p-3 text-left">ใคร</th>
-                        <th class="p-3 text-left">เวร</th>
+                        <th class="p-3 text-left cursor-pointer hover:bg-gray-100 transition" onclick="toggleSort('template')">
+                            <div class="flex items-center gap-1">
+                                เวร
+                                <span id="sortTemplate" class="text-gray-400 text-xs">↕️</span>
+                            </div>
+                        </th>
                         <th class="p-3 text-left">เวลา</th>
                         <th class="p-3 text-right">รายได้</th>
                         <th class="p-3 text-center"></th>
@@ -257,7 +268,7 @@
 
 <script>
 // ============================================
-// 🔥 FIREBASE CONFIG (ใส่ของคุณเอง)
+// 🔥 FIREBASE CONFIG — ⚠️ ต้องแก้ตรงนี้!
 // ============================================
 const firebaseConfig = {
   apiKey: "AIzaSyDL6BlmF4NouTDDE42EsvLZzfDfgCLSscs",
@@ -272,7 +283,7 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 // ============================================
-//  STATE
+// 📊 STATE
 // ============================================
 let currentUser = null;
 let currentFamilyCode = null;
@@ -283,6 +294,8 @@ let shifts = [];
 let currentYear, currentMonth;
 let selectedFilter = 'all';
 let editingTemplateId = null;
+let sortField = 'date';
+let sortDirection = 'desc';
 
 const today = new Date();
 currentYear = today.getFullYear();
@@ -304,10 +317,8 @@ auth.onAuthStateChanged(async (user) => {
     if (user) {
         currentUser = user;
         document.getElementById('userName').textContent = user.displayName;
-        
         const familiesRef = db.collection('families');
         const snapshot = await familiesRef.where('memberUids', 'array-contains', user.uid).limit(1).get();
-        
         if (snapshot.empty) {
             showScreen('setupScreen');
         } else {
@@ -330,7 +341,7 @@ function showScreen(screenId) {
 }
 
 // ============================================
-// 👨‍‍👧 FAMILY MANAGEMENT
+// 👨‍👩👧 FAMILY MANAGEMENT
 // ============================================
 function generateFamilyCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -342,10 +353,8 @@ function generateFamilyCode() {
 async function createFamily() {
     const familyName = prompt('ตั้งชื่อครอบครัว:');
     if (!familyName) return;
-    
     const familyCode = generateFamilyCode();
     const batch = db.batch();
-    
     const familyRef = db.collection('families').doc(familyCode);
     batch.set(familyRef, {
         familyName: familyName,
@@ -353,9 +362,7 @@ async function createFamily() {
         createdBy: currentUser.uid,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
-    const memberRef = familyRef.collection('members').doc(currentUser.uid);
-    batch.set(memberRef, {
+    batch.set(familyRef.collection('members').doc(currentUser.uid), {
         name: currentUser.displayName,
         email: currentUser.email,
         role: 'owner',
@@ -363,9 +370,7 @@ async function createFamily() {
         isDoctor: true,
         joinedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
     batch.set(db.collection('familyCodes').doc(familyCode), { familyCode: familyCode });
-    
     await batch.commit();
     currentFamilyCode = familyCode;
     await loadFamilyData();
@@ -376,16 +381,12 @@ async function createFamily() {
 async function joinFamily() {
     const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
     if (!code) return alert('กรุณาใส่รหัส');
-    
     const familyRef = db.collection('families').doc(code);
     const familyDoc = await familyRef.get();
-    
     if (!familyDoc.exists) return alert('❌ ไม่พบรหัสครอบครัวนี้');
-    
     await familyRef.update({
         memberUids: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
     });
-    
     await familyRef.collection('members').doc(currentUser.uid).set({
         name: currentUser.displayName,
         email: currentUser.email,
@@ -394,7 +395,6 @@ async function joinFamily() {
         isDoctor: true,
         joinedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    
     currentFamilyCode = code;
     await loadFamilyData();
     showScreen('mainApp');
@@ -406,26 +406,22 @@ async function joinFamily() {
 // ============================================
 async function loadFamilyData() {
     const familyRef = db.collection('families').doc(currentFamilyCode);
-    
     const memberDoc = await familyRef.collection('members').doc(currentUser.uid).get();
     currentMemberData = memberDoc.data();
-    
     familyRef.onSnapshot((doc) => {
         document.getElementById('familyName').textContent = '🏠 ' + doc.data().familyName;
     });
-    
     familyRef.collection('members').onSnapshot((snapshot) => {
         familyMembers = {};
         snapshot.forEach(doc => { familyMembers[doc.id] = doc.data(); });
         renderMembersFilter();
         renderCalendar();
     });
-    
     familyRef.collection('templates').onSnapshot((snapshot) => {
         templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderTemplates();
+        renderFavoriteTemplates();
     });
-    
     familyRef.collection('shifts').onSnapshot((snapshot) => {
         shifts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         renderCalendar();
@@ -435,11 +431,113 @@ async function loadFamilyData() {
 }
 
 // ============================================
+// ⭐ FAVORITE TEMPLATES
+// ============================================
+function getFavorites() {
+    return templates.filter(t => t.isFavorite).sort((a, b) => a.favoriteRank - b.favoriteRank);
+}
+
+function getNonFavorites() {
+    return templates.filter(t => !t.isFavorite);
+}
+
+async function toggleFavorite(templateId) {
+    const tpl = templates.find(t => t.id === templateId);
+    if (!tpl) return;
+    
+    if (tpl.isFavorite) {
+        // ลบออกจาก favorite
+        await db.collection('families').doc(currentFamilyCode)
+            .collection('templates').doc(templateId)
+            .update({
+                isFavorite: false,
+                favoriteRank: null
+            });
+    } else {
+        // เพิ่มเป็น favorite (อันดับสุดท้าย)
+        const favorites = getFavorites();
+        const newRank = favorites.length >= 5 ? 5 : favorites.length + 1;
+        
+        await db.collection('families').doc(currentFamilyCode)
+            .collection('templates').doc(templateId)
+            .update({
+                isFavorite: true,
+                favoriteRank: newRank
+            });
+    }
+}
+
+async function moveFavorite(templateId, direction) {
+    const tpl = templates.find(t => t.id === templateId);
+    if (!tpl || !tpl.isFavorite) return;
+    
+    const favorites = getFavorites();
+    const currentRank = tpl.favoriteRank;
+    const newRank = currentRank + direction;
+    
+    if (newRank < 1 || newRank > 5) return;
+    
+    // หา template ที่อยู่อันดับใหม่
+    const otherTpl = favorites.find(t => t.favoriteRank === newRank);
+    
+    if (otherTpl) {
+        // สลับอันดับ
+        await db.collection('families').doc(currentFamilyCode)
+            .collection('templates').doc(templateId)
+            .update({ favoriteRank: newRank });
+        
+        await db.collection('families').doc(currentFamilyCode)
+            .collection('templates').doc(otherTpl.id)
+            .update({ favoriteRank: currentRank });
+    } else {
+        // ย้ายไปอันดับว่าง
+        await db.collection('families').doc(currentFamilyCode)
+            .collection('templates').doc(templateId)
+            .update({ favoriteRank: newRank });
+    }
+}
+
+function renderFavoriteTemplates() {
+    const container = document.getElementById('favoriteTemplateList');
+    const favorites = getFavorites();
+    
+    document.getElementById('favoriteCount').textContent = `${favorites.length}/5`;
+    
+    if (favorites.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">กด ⭐ เพื่อเพิ่ม favorite</div>';
+        return;
+    }
+    
+    container.innerHTML = '';
+    favorites.forEach((tpl, index) => {
+        const div = document.createElement('div');
+        div.className = 'favorite-card rounded-lg p-3 relative';
+        div.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <span class="rank-badge">${index + 1}</span>
+                    <span class="w-3 h-3 rounded-full flex-shrink-0" style="background:${tpl.color}"></span>
+                    <span class="font-medium text-sm text-gray-700 truncate">${tpl.name}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    ${index > 0 ? `<button onclick="moveFavorite('${tpl.id}', -1)" class="text-gray-500 hover:text-blue-500 transition text-sm">▲</button>` : ''}
+                    ${index < favorites.length - 1 ? `<button onclick="moveFavorite('${tpl.id}', 1)" class="text-gray-500 hover:text-blue-500 transition text-sm">▼</button>` : ''}
+                    <button onclick="toggleFavorite('${tpl.id}')" class="favorite-btn text-amber-500 hover:text-red-500 transition ml-1" title="ลบออกจาก favorite">⭐</button>
+                </div>
+            </div>
+            <div class="text-xs text-gray-600 mt-1 ml-8">
+                ${tpl.start} - ${tpl.end} ${tpl.overnight ? '(ค้างคืน)' : ''} · ${tpl.rate} ฿/ชม.
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// ============================================
 // 📅 SHIFT MANAGEMENT
 // ============================================
 async function addShift(date, templateId) {
     document.getElementById('syncStatus').textContent = '● Syncing...';
-    
     await db.collection('families').doc(currentFamilyCode)
         .collection('shifts').add({
             date: date,
@@ -454,12 +552,10 @@ async function addShift(date, templateId) {
 async function removeShift(shiftId) {
     const shift = shifts.find(s => s.id === shiftId);
     if (!shift) return;
-    
     if (shift.assignedTo !== currentUser.uid) {
         alert('⚠️ คุณสามารถลบเวรของตัวเองเท่านั้น');
         return;
     }
-    
     await db.collection('families').doc(currentFamilyCode)
         .collection('shifts').doc(shiftId).delete();
 }
@@ -470,13 +566,11 @@ async function removeShift(shiftId) {
 function renderMembersFilter() {
     const container = document.getElementById('membersFilter');
     container.innerHTML = '<span class="text-sm text-gray-600">ดูเวรของ:</span>';
-    
     const allBtn = document.createElement('button');
     allBtn.className = `member-badge ${selectedFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700'}`;
     allBtn.textContent = 'ทั้งหมด';
     allBtn.onclick = () => { selectedFilter = 'all'; renderMembersFilter(); renderCalendar(); };
     container.appendChild(allBtn);
-    
     Object.keys(familyMembers).forEach(uid => {
         const member = familyMembers[uid];
         const btn = document.createElement('button');
@@ -491,40 +585,32 @@ function renderMembersFilter() {
 function renderCalendar() {
     const monthNames = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
     document.getElementById('monthLabel').textContent = `${monthNames[currentMonth]} ${currentYear + 543}`;
-    
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '';
-    
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const firstDayOfWeek = new Date(currentYear, currentMonth, 1).getDay();
+    const firstDay = (firstDayOfWeek + 6) % 7;
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const blocked = getBlockedDates();
-    
     for (let i = 0; i < firstDay; i++) {
         const cell = document.createElement('div');
         cell.className = 'calendar-cell border-b border-r border-gray-100 bg-gray-50/50';
         grid.appendChild(cell);
     }
-    
     for (let d = 1; d <= daysInMonth; d++) {
         const key = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         let dayShifts = shifts.filter(s => s.date === key);
-        
         if (selectedFilter !== 'all') {
             dayShifts = dayShifts.filter(s => s.assignedTo === selectedFilter);
         }
-        
         const isBlocked = blocked.has(key);
         const isToday = d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
         const dayOfWeek = new Date(currentYear, currentMonth, d).getDay();
-        
         const cell = document.createElement('div');
         cell.className = `calendar-cell border-b border-r border-gray-100 p-2 relative cursor-pointer ${isBlocked ? 'blocked' : ''}`;
         cell.onclick = () => openShiftModal(key, d);
-        
         let dateNum = `<div class="flex items-center justify-between mb-1">
             <span class="text-sm font-medium ${isToday ? 'bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center' : (dayOfWeek === 0 ? 'text-red-400' : dayOfWeek === 6 ? 'text-blue-400' : 'text-gray-700')}">${d}</span>
         </div>`;
-        
         let shiftChips = '';
         dayShifts.forEach(s => {
             const tpl = templates.find(t => t.id === s.templateId);
@@ -536,11 +622,9 @@ function renderCalendar() {
                 </div>`;
             }
         });
-        
         cell.innerHTML = dateNum + shiftChips;
         grid.appendChild(cell);
     }
-    
     const totalCells = firstDay + daysInMonth;
     const remaining = (7 - (totalCells % 7)) % 7;
     for (let i = 0; i < remaining; i++) {
@@ -550,17 +634,22 @@ function renderCalendar() {
     }
 }
 
-// ⭐ RENDER TEMPLATES WITH EDIT BUTTON
 function renderTemplates() {
     const list = document.getElementById('templateList');
     list.innerHTML = '';
+    const nonFavorites = getNonFavorites();
     
     if (templates.length === 0) {
         list.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">ยังไม่มี template<br>กด + เพื่อเพิ่ม</div>';
         return;
     }
     
-    templates.forEach(tpl => {
+    if (nonFavorites.length === 0) {
+        list.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">ทุก template เป็น favorite แล้ว ⭐</div>';
+        return;
+    }
+    
+    nonFavorites.forEach(tpl => {
         const div = document.createElement('div');
         div.className = 'template-card bg-gray-50 rounded-lg p-3 group relative';
         div.innerHTML = `
@@ -569,11 +658,10 @@ function renderTemplates() {
                     <span class="w-3 h-3 rounded-full flex-shrink-0" style="background:${tpl.color}"></span>
                     <span class="font-medium text-sm text-gray-700 truncate">${tpl.name}</span>
                 </div>
-                <button onclick="openEditTemplateModal('${tpl.id}')" 
-                        class="edit-btn text-gray-400 hover:text-blue-500 transition ml-2 flex-shrink-0"
-                        title="แก้ไข">
-                    ✏️
-                </button>
+                <div class="flex items-center gap-1">
+                    <button onclick="toggleFavorite('${tpl.id}')" class="favorite-btn text-gray-400 hover:text-amber-500 transition" title="เพิ่มเป็น favorite">⭐</button>
+                    <button onclick="openEditTemplateModal('${tpl.id}')" class="edit-btn text-gray-400 hover:text-blue-500 transition ml-2 flex-shrink-0" title="แก้ไข">✏️</button>
+                </div>
             </div>
             <div class="text-xs text-gray-500 mt-1 ml-5">
                 ${tpl.start} - ${tpl.end} ${tpl.overnight ? '(ค้างคืน)' : ''} · ${tpl.rate} ฿/ชม.
@@ -588,35 +676,44 @@ function renderIncome() {
     const noIncome = document.getElementById('noIncome');
     tbody.innerHTML = '';
     let total = 0;
-    
     let monthShifts = shifts.filter(s => {
         const [y, m] = s.date.split('-').map(Number);
         return y === currentYear && m === currentMonth + 1;
     });
-    
     if (selectedFilter !== 'all') {
         monthShifts = monthShifts.filter(s => s.assignedTo === selectedFilter);
     }
-    
+    monthShifts.sort((a, b) => {
+        let valueA, valueB;
+        if (sortField === 'date') {
+            valueA = a.date;
+            valueB = b.date;
+        } else if (sortField === 'template') {
+            const tplA = templates.find(t => t.id === a.templateId);
+            const tplB = templates.find(t => t.id === b.templateId);
+            valueA = tplA ? tplA.name : '';
+            valueB = tplB ? tplB.name : '';
+        }
+        if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+        if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
     if (monthShifts.length === 0) {
         noIncome.classList.remove('hidden');
         document.getElementById('totalIncome').textContent = '0 ฿';
         return;
     }
     noIncome.classList.add('hidden');
-    
     monthShifts.forEach(s => {
         const tpl = templates.find(t => t.id === s.templateId);
         const assignee = familyMembers[s.assignedTo];
         if (!tpl || !assignee) return;
-        
         const hours = calcHours(tpl.start, tpl.end, tpl.overnight);
         const income = hours * tpl.rate;
         total += income;
-        
         const [y, m, d] = s.date.split('-');
         const tr = document.createElement('tr');
-        tr.className = 'border-b border-gray-50';
+        tr.className = 'border-b border-gray-50 hover:bg-gray-50 transition';
         tr.innerHTML = `
             <td class="p-3">${d}/${m}/${y.slice(2)}</td>
             <td class="p-3">
@@ -639,40 +736,29 @@ function renderIncome() {
         `;
         tbody.appendChild(tr);
     });
-    
     document.getElementById('totalIncome').textContent = total.toLocaleString() + ' ฿';
 }
 
-// ============================================
-// ️ BLOCKED DATES
-// ============================================
 function getBlockedDates() {
     const blocked = new Set();
-    
     Object.keys(familyMembers).forEach(uid => {
         const personShifts = shifts.filter(s => s.assignedTo === uid);
         const personBlocked = new Set();
-        
         personShifts.forEach(shift => {
             const tpl = templates.find(t => t.id === shift.templateId);
             if (!tpl) return;
-            
             const cond20 = document.getElementById('cond20').checked;
             const condOvernight = document.getElementById('condOvernight').checked;
-            
             const [sh, sm] = tpl.start.split(':').map(Number);
             const [eh, em] = tpl.end.split(':').map(Number);
             const isOvernight = tpl.overnight || (eh * 60 + em) <= (sh * 60 + sm);
-            
             if ((condOvernight && isOvernight) || (cond20 && eh >= 20) || (cond20 && isOvernight)) {
                 const d = new Date(shift.date + 'T00:00:00');
                 let blockStart = new Date(d);
                 if (isOvernight) blockStart.setDate(blockStart.getDate() + 1);
                 blockStart.setHours(eh, em, 0, 0);
-                
                 let blockEnd = new Date(blockStart);
                 blockEnd.setHours(blockEnd.getHours() + 24);
-                
                 let cursor = new Date(blockStart);
                 cursor.setHours(0, 0, 0, 0);
                 while (cursor < blockEnd) {
@@ -682,12 +768,10 @@ function getBlockedDates() {
                 }
             }
         });
-        
         if (selectedFilter === 'all' || selectedFilter === uid) {
             personBlocked.forEach(date => blocked.add(date));
         }
     });
-    
     return blocked;
 }
 
@@ -701,20 +785,17 @@ function calcHours(start, end, overnight) {
 }
 
 // ============================================
-// ✏️ EDIT TEMPLATE FUNCTIONS
+// ✏️ EDIT TEMPLATE
 // ============================================
 function openEditTemplateModal(templateId) {
     const tpl = templates.find(t => t.id === templateId);
     if (!tpl) return;
-    
     editingTemplateId = templateId;
-    
     document.getElementById('editTplName').value = tpl.name;
     document.getElementById('editTplStart').value = tpl.start;
     document.getElementById('editTplEnd').value = tpl.end;
     document.getElementById('editTplRate').value = tpl.rate;
     document.getElementById('editTplOvernight').checked = tpl.overnight || false;
-    
     document.getElementById('editTemplateModal').classList.remove('hidden');
 }
 
@@ -725,18 +806,15 @@ function closeEditModal() {
 
 async function saveEditTemplate() {
     if (!editingTemplateId) return;
-    
     const name = document.getElementById('editTplName').value.trim();
     const start = document.getElementById('editTplStart').value;
     const end = document.getElementById('editTplEnd').value;
     const rate = parseInt(document.getElementById('editTplRate').value);
     const overnight = document.getElementById('editTplOvernight').checked;
-    
     if (!name || !start || !end || !rate) {
         alert('กรุณากรอกข้อมูลให้ครบ');
         return;
     }
-    
     try {
         await db.collection('families').doc(currentFamilyCode)
             .collection('templates').doc(editingTemplateId)
@@ -748,7 +826,6 @@ async function saveEditTemplate() {
                 overnight: overnight,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-        
         closeEditModal();
         alert('✅ แก้ไข template สำเร็จ!');
     } catch (error) {
@@ -758,15 +835,10 @@ async function saveEditTemplate() {
 
 async function deleteTemplate() {
     if (!editingTemplateId) return;
-    
-    if (!confirm('⚠️ ต้องการลบ template นี้?\nเวรที่ใช้ template นี้อาจแสดงผลผิดปกติ')) {
-        return;
-    }
-    
+    if (!confirm('⚠️ ต้องการลบ template นี้?')) return;
     try {
         await db.collection('families').doc(currentFamilyCode)
             .collection('templates').doc(editingTemplateId).delete();
-        
         closeEditModal();
         alert('✅ ลบ template สำเร็จ!');
     } catch (error) {
@@ -775,38 +847,30 @@ async function deleteTemplate() {
 }
 
 // ============================================
-// 📤 EXPORT .ics
+//  EXPORT
 // ============================================
 function exportToGoogleCalendar() {
     let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Doctor Couple Shift//TH\n";
-    
     let exportShifts = shifts;
     if (selectedFilter !== 'all') {
         exportShifts = shifts.filter(s => s.assignedTo === selectedFilter);
     }
-    
     exportShifts.forEach(s => {
         const tpl = templates.find(t => t.id === s.templateId);
         const assignee = familyMembers[s.assignedTo];
         if (!tpl || !assignee) return;
-        
         const [y, m, d] = s.date.split('-');
         const [sh, sm] = tpl.start.split(':');
         const [eh, em] = tpl.end.split(':');
-        
         let startDate = `${y}${m}${d}T${sh}${sm}00`;
         let endDate = `${y}${m}${d}T${eh}${em}00`;
-        
         if (tpl.overnight || (parseInt(eh) * 60 + parseInt(em)) <= (parseInt(sh) * 60 + parseInt(sm))) {
             const nextDay = new Date(parseInt(y), parseInt(m)-1, parseInt(d) + 1);
             endDate = `${nextDay.getFullYear()}${String(nextDay.getMonth()+1).padStart(2,'0')}${String(nextDay.getDate()).padStart(2,'0')}T${eh}${em}00`;
         }
-        
         icsContent += `BEGIN:VEVENT\nDTSTART:${startDate}\nDTEND:${endDate}\nSUMMARY:${assignee.name} - ${tpl.name}\nEND:VEVENT\n`;
     });
-    
     icsContent += "END:VCALENDAR";
-    
     const blob = new Blob([icsContent], { type: 'text/calendar' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -817,29 +881,59 @@ function exportToGoogleCalendar() {
 }
 
 // ============================================
-// 🎯 NAVIGATION
+// 🔀 SORT
+// ============================================
+function toggleSort(field) {
+    if (sortField === field) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortField = field;
+        sortDirection = 'desc';
+    }
+    updateSortIndicators();
+    renderIncome();
+}
+
+function updateSortIndicators() {
+    document.getElementById('sortDate').textContent = '↕️';
+    document.getElementById('sortTemplate').textContent = '↕️';
+    const activeIndicator = sortField === 'date' ? 'sortDate' : 'sortTemplate';
+    document.getElementById(activeIndicator).textContent = sortDirection === 'asc' ? '⬆️' : '⬇️';
+}
+
+// ============================================
+// 🎯 NAVIGATION & MODALS
 // ============================================
 function prevMonth() { currentMonth--; if (currentMonth < 0) { currentMonth = 11; currentYear--; } renderCalendar(); renderIncome(); }
 function nextMonth() { currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; } renderCalendar(); renderIncome(); }
 function goToday() { currentYear = today.getFullYear(); currentMonth = today.getMonth(); renderCalendar(); renderIncome(); }
 
-// ============================================
-// 📋 MODALS
-// ============================================
 function openShiftModal(date, day) {
     if (templates.length === 0) {
         alert('ยังไม่มี template กรุณาเพิ่ม template ก่อน');
         return;
     }
+    const favorites = getFavorites();
+    const nonFavorites = getNonFavorites();
     
-    const options = templates.map((t, i) => `${i+1}. ${t.name} (${t.start}-${t.end})`).join('\n');
+    let options = '=== ⭐ Favorite Templates ===\n';
+    favorites.forEach((t, i) => {
+        options += `${i+1}. ${t.name} (${t.start}-${t.end})\n`;
+    });
+    
+    if (nonFavorites.length > 0) {
+        options += '\n=== Templates อื่นๆ ===\n';
+        nonFavorites.forEach((t, i) => {
+            options += `${favorites.length + i + 1}. ${t.name} (${t.start}-${t.end})\n`;
+        });
+    }
+    
     const choice = prompt(`เลือก Template:\n${options}\n\nพิมพ์หมายเลข:`);
-    
     if (!choice) return;
     const idx = parseInt(choice) - 1;
-    
-    if (idx >= 0 && idx < templates.length) {
-        addShift(date, templates[idx].id);
+    const allTemplates = [...favorites, ...nonFavorites];
+    if (idx >= 0 && idx < allTemplates.length) {
+        addShift(date, allTemplates[idx].id);
     }
 }
 
@@ -849,13 +943,13 @@ function openTemplateModal() {
     const start = prompt('เวลาเริ่ม (HH:MM):', '08:00');
     const end = prompt('เวลาสิ้นสุด (HH:MM):', '16:00');
     const rate = parseInt(prompt('เรท (บาท/ชม.):', '500'));
-    
     const colors = ['#3B82F6', '#10B981', '#EF4444', '#F59E0B', '#8B5CF6', '#EC4899'];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    
     db.collection('families').doc(currentFamilyCode)
         .collection('templates').add({
             name, start, end, rate, color, overnight: false,
+            isFavorite: false,
+            favoriteRank: null,
             createdBy: currentUser.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -874,9 +968,6 @@ function showMembers() {
     alert(msg);
 }
 
-// ============================================
-// 🚀 INIT
-// ============================================
 document.getElementById('cond20').addEventListener('change', renderCalendar);
 document.getElementById('condOvernight').addEventListener('change', renderCalendar);
 </script>
