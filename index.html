@@ -868,7 +868,8 @@ function exportToGoogleCalendar() {
             const nextDay = new Date(parseInt(y), parseInt(m)-1, parseInt(d) + 1);
             endDate = `${nextDay.getFullYear()}${String(nextDay.getMonth()+1).padStart(2,'0')}${String(nextDay.getDate()).padStart(2,'0')}T${eh}${em}00`;
         }
-        icsContent += `BEGIN:VEVENT\nDTSTART:${startDate}\nDTEND:${endDate}\nSUMMARY:${assignee.name} - ${tpl.name}\nEND:VEVENT\n`;
+        // ⭐ แก้ตรงนี้: เอา assignee.name - ออก เหลือแค่ tpl.name
+        icsContent += `BEGIN:VEVENT\nDTSTART:${startDate}\nDTEND:${endDate}\nSUMMARY:${tpl.name}\nEND:VEVENT\n`;
     });
     icsContent += "END:VCALENDAR";
     const blob = new Blob([icsContent], { type: 'text/calendar' });
@@ -879,7 +880,6 @@ function exportToGoogleCalendar() {
     a.click();
     URL.revokeObjectURL(url);
 }
-
 // ============================================
 // 🔀 SORT
 // ============================================
